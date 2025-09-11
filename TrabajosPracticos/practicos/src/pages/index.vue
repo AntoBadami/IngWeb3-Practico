@@ -1,7 +1,8 @@
 <template>
-  <HelloWorld />
+  <ProductList />
+  <AddProduct />
 </template>
 
 <script setup>
-  //
+
 </script>
