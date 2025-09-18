@@ -1,6 +1,5 @@
 <template>
   <ProductList />
-  <AddProduct />
 </template>
 
 <script setup>
