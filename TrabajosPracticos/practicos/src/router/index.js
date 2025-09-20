@@ -1,11 +1,11 @@
 
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '../views/Home.vue'
+import ProductList from '../components/ProductList.vue'
 import Login from '../views/Login.vue'
 import { useAuth } from '../composables/useAuth'
 
 const routes = [
-  { path: '/', name: 'Home', component: Home, meta: { requiresAuth: true } },
+  { path: '/', name: 'Productos', component: ProductList, meta: { requiresAuth: true } },
   { path: '/login', name: 'Login', component: Login }
 ]
 
@@ -14,6 +14,7 @@ const router = createRouter({
   routes
 })
 
+// restaura auth y redirige según estado
 router.beforeEach((to, from) => {
   const { isAuthenticated, restore } = useAuth()
   restore() // restaura estado desde localStorage 

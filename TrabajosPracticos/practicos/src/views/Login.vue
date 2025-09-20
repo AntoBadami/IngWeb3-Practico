@@ -1,4 +1,3 @@
-
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
     <v-row>
@@ -45,15 +44,12 @@
                   Ingresar
                 </v-btn>
 
-                <v-btn text small @click="fillTestCredentials" aria-label="Rellenar credenciales">
-                  Usar credenciales
-                </v-btn>
               </div>
             </form>
           </v-card-text>
 
           <v-card-actions class="justify-center">
-            <small class="text-muted">Si no tenés cuenta usá: <strong>test@example.com / secret123</strong></small>
+            <small class="text-muted">Contactá al administrador si no tenés credenciales.</small>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -62,7 +58,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '../composables/useAuth'
 
@@ -74,42 +70,62 @@ const email = ref('')
 const password = ref('')
 const submitError = ref('')
 
-const emailError = computed(() => {
+// Nuevo flag: solo mostrar validaciones después de intentar enviar
+const attempted = ref(false)
+
+const emailValidationMessage = () => {
   if (!email.value) return 'El email es obligatorio'
-  // validación simple de email
   const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   if (!re.test(email.value)) return 'Formato de email inválido'
   return ''
-})
+}
 
-const passwordError = computed(() => {
+const passwordValidationMessage = () => {
   if (!password.value) return 'La contraseña es obligatoria'
   if (password.value.length < 6) return 'La contraseña debe tener al menos 6 caracteres'
   return ''
+}
+
+//devolver mensaje si ya se intentó enviar el formulario
+const emailError = computed(() => {
+  if (!attempted.value) return ''
+  return emailValidationMessage()
 })
 
-const formIsValid = computed(() => !emailError.value && !passwordError.value)
+const passwordError = computed(() => {
+  if (!attempted.value) return ''
+  return passwordValidationMessage()
+})
+
+const formIsValid = computed(() => {
+  return !emailValidationMessage() && !passwordValidationMessage()
+})
+
+// limpiar mensaje de error de submit cuando usuario edita campos
+watch([email, password], () => {
+  if (submitError.value) submitError.value = ''
+})
 
 async function onSubmit() {
+  attempted.value = true
   submitError.value = ''
-  if (!formIsValid.value) return
+
+  if (!formIsValid.value) {
+    return
+  }
+
   try {
     await auth.login(email.value.trim(), password.value)
-    // redirigir al destino original si existe
+    // redirigir a la página de productos
     const redirect = route.query.redirect || '/'
     router.replace(redirect)
   } catch (e) {
-    // mostrar mensaje legible
+    // mostrar error 
     submitError.value = e?.message || 'Error al autenticarse'
   }
-}
-
-function fillTestCredentials() {
-  email.value = 'juan@gmail.com'
-  password.value = '12345678'
 }
 </script>
 
 <style scoped>
-.v-card { border-radius: 1.25rem; } /* radius 2xl feel */
+.v-card { border-radius: 1.25rem; }
 </style>
