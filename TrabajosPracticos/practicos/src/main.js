@@ -1,23 +1,22 @@
-/**
- * main.js
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
-
-// Plugins
-import { registerPlugins } from '@/plugins'
-
-// Components
-import App from './App.vue'
-
-// Composables
+// src/main.js (snippet)
 import { createApp } from 'vue'
+import App from './App.vue'
+import router from './router'
+import { useAuth } from './composables/useAuth'
 
-// Styles
-import 'unfonts.css'
+// Vuetify e imports ya existentes
+import registerPlugins from './plugins/registerPlugins' 
 
 const app = createApp(App)
 
-registerPlugins(app)
+// registrar Vuetify, plugins
+registerPlugins && registerPlugins(app)
+
+// Restaurar sesión ANTES de montar la app
+const auth = useAuth()
+auth.restore()
+
+// registrar router
+app.use(router)
 
 app.mount('#app')
