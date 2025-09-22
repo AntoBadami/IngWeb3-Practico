@@ -15,6 +15,10 @@
           <v-icon>mdi-cart</v-icon>
         </v-btn>
         <v-badge :content="cartTotalItems" bordered v-if="cartTotalItems > 0" class="ml-2"/>
+        <!-- Botón Salir -->
+        <v-btn text small class="ml-2" @click="onLogout" aria-label="Salir" title="Salir">
+          Salir
+        </v-btn>
       </v-col>
     </v-row>
 
@@ -62,6 +66,8 @@ import { ref, computed, onMounted, watch } from 'vue';
 import productsData from '@/data/exampleProducts.js';
 import ProductCard from '@/components/ProductCard.vue';
 import CartDrawer from '@/components/CartDrawer.vue';
+import { useRouter } from 'vue-router'
+import { useAuth } from '../composables/useAuth'
 
 const STORAGE_KEY_CART = 'example-cart';
 
@@ -69,6 +75,9 @@ const products = ref([...productsData]); // copia de los ejemplos
 const search = ref('');
 const cart = ref([]); // [{id, qty}]
 const drawer = ref(false);
+
+const auth = useAuth()
+const router = useRouter()
 
 // load cart
 onMounted(() => {
@@ -122,6 +131,11 @@ function clearCart() { cart.value = []; }
 function checkout() {
   alert(`Compra finalizada. Total: $${cartTotalPrice.value}`);
   clearCart();
+}
+//cerrar sesion
+function onLogout() {
+  auth.logout()
+  router.replace({ path: '/login' })
 }
 
 // cartDetails & totals
