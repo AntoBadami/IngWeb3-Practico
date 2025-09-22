@@ -44,6 +44,9 @@
                   Ingresar
                 </v-btn>
 
+                <v-btn text small @click="goRegister" aria-label="Registrar usuario">
+                  Registrar usuario
+                </v-btn>
               </div>
             </form>
           </v-card-text>
@@ -100,6 +103,11 @@ const passwordError = computed(() => {
 const formIsValid = computed(() => {
   return !emailValidationMessage() && !passwordValidationMessage()
 })
+
+// función para ir a registro
+function goRegister() {
+  router.push({ path: '/register' })
+}
 
 // limpiar mensaje de error de submit cuando usuario edita campos
 watch([email, password], () => {

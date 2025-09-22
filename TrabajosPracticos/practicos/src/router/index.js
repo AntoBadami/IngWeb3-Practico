@@ -2,11 +2,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import ProductList from '../components/ProductList.vue'
 import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
 import { useAuth } from '../composables/useAuth'
 
 const routes = [
   { path: '/', name: 'Productos', component: ProductList, meta: { requiresAuth: true } },
-  { path: '/login', name: 'Login', component: Login }
+  { path: '/login', name: 'Login', component: Login },
+  { path: '/register', name: 'Register', component: Register } 
 ]
 
 const router = createRouter({
