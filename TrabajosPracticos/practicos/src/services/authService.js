@@ -29,9 +29,13 @@ function saveStoredUsers(users) {
 
 function getAllUsers() {
   const stored = loadStoredUsers();
+  // return mock users first, then stored
   return [...MOCK_USERS, ...stored];
 }
 
+/**
+ * loginApi({email,password}) -> Promise resolves {user, token} or rejects Error
+ */
 export function loginApi({ email, password }) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
@@ -50,14 +54,12 @@ export function loginApi({ email, password }) {
 }
 
 /**
- * registerApi({ name, email, password }) 
  * - Valida email único y password >= 6
- * - Guarda en localStorage
+ * - Guarda en localStorage 
  */
 export function registerApi({ name, email, password }) {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      // validaciones básicas
       if (!name || String(name).trim().length < 3) {
         return reject(new Error('El nombre debe tener al menos 3 caracteres.'));
       }
@@ -75,7 +77,6 @@ export function registerApi({ name, email, password }) {
         return reject(new Error('Ya existe un usuario con ese email.'));
       }
 
-      // guardar en storage
       const stored = loadStoredUsers();
       const newUser = { name: String(name).trim(), email, password };
       stored.push(newUser);
@@ -83,13 +84,26 @@ export function registerApi({ name, email, password }) {
 
       console.log('[authService] nuevo usuario registrado:', newUser);
 
-      // devolver user (sin password)
       resolve({ email: newUser.email, name: newUser.name });
     }, 600);
   });
 }
 
 export function validateToken(token) {
-  // Mock: token válido si es exactamente 'fake-jwt-token'
   return token === 'fake-jwt-token';
 }
+
+// utilidad para listar todos los usuarios (mock + guardados)
+export function getAllUsersExport() {
+  return getAllUsers();
+}
+
+// default export (compatibilidad)
+const defaultExport = {
+  loginApi,
+  registerApi,
+  validateToken,
+  getAllUsers: getAllUsersExport
+};
+
+export default defaultExport;

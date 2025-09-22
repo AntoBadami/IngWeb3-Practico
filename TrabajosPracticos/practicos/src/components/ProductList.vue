@@ -4,21 +4,19 @@
       <v-col cols="8">
         <v-text-field
           label="Buscar"
-          variant="outlined"
-          prepend-inner-icon="mdi-magnify"
           v-model="search"
+          clearable
+          prepend-inner-icon="mdi-magnify"
+          aria-label="Buscar productos"
         />
       </v-col>
 
       <v-col cols="auto" class="d-flex align-center">
         <v-btn icon @click="drawer = !drawer" :title="drawer ? 'Cerrar carrito' : 'Abrir carrito'">
-          <v-icon>mdi-cart</v-icon>
+          <v-icon>{{ drawer ? 'mdi-cart-off' : 'mdi-cart' }}</v-icon>
         </v-btn>
-        <v-badge :content="cartTotalItems" bordered v-if="cartTotalItems > 0" class="ml-2"/>
-        <!-- Botón Salir -->
-        <v-btn text small class="ml-2" @click="onLogout" aria-label="Salir" title="Salir">
-          Salir
-        </v-btn>
+
+        <v-btn text small class="ml-2" @click="onLogout">Salir</v-btn>
       </v-col>
     </v-row>
 
@@ -28,135 +26,130 @@
         :key="product.id"
         cols="12"
         sm="6"
-        md="4"
       >
         <ProductCard
           :product="product"
           :cartQty="cartQty(product.id)"
           @add-to-cart="addToCart"
+          @view-detail="goToDetail"
         />
       </v-col>
-    </v-row>
 
-    <v-row v-if="filteredProducts.length === 0">
-      <v-col cols="12">
+      <v-col cols="12" v-if="filteredProducts.length === 0">
         <v-alert type="info">
           <span v-if="products.length === 0">No hay productos registrados.</span>
-          <span v-else>No se encontraron productos que coincidan con "{{ search }}".</span>
+          <span v-else>No se encontraron productos que coincidan con la búsqueda.</span>
         </v-alert>
       </v-col>
     </v-row>
 
-    <!-- Drawer: carrito -->
+    <!-- Drawer del carrito -->
     <CartDrawer
       v-model:open="drawer"
       :cartDetails="cartDetails"
-      :totalPrice="cartTotalPrice"
+      :totalPrice="totalPrice"
       @increment="incrementQty"
       @decrement="decrementQty"
-      @remove="removeFromCart"
+      @remove="removeItem"
       @clear="clearCart"
-      @checkout="checkout"
     />
   </v-container>
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
-import productsData from '@/data/exampleProducts.js';
-import ProductCard from '@/components/ProductCard.vue';
-import CartDrawer from '@/components/CartDrawer.vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuth } from '../composables/useAuth'
+import ProductCard from './ProductCard.vue'
+import CartDrawer from './CartDrawer.vue'
+import productsData from '../data/exampleProducts' 
 
-const STORAGE_KEY_CART = 'example-cart';
+const products = ref(productsData || [])
+const search = ref('')
+const drawer = ref(false)
 
-const products = ref([...productsData]); // copia de los ejemplos
-const search = ref('');
-const cart = ref([]); // [{id, qty}]
-const drawer = ref(false);
+const cart = ref([]) // {id, qty, price, name}
 
-const auth = useAuth()
-const router = useRouter()
-
-// load cart
-onMounted(() => {
-  const raw = localStorage.getItem(STORAGE_KEY_CART);
-  cart.value = raw ? JSON.parse(raw) : [];
-});
-
-// persist
-watch(cart, (c) => {
-  localStorage.setItem(STORAGE_KEY_CART, JSON.stringify(c));
-}, { deep: true });
-
-// filtered
+// productos filtrados
 const filteredProducts = computed(() => {
-  const q = String(search.value || '').trim().toLowerCase();
-  if (!q) return products.value;
-  return products.value.filter(p => String(p.name).toLowerCase().includes(q));
-});
+  const q = String(search.value || '').trim().toLowerCase()
+  if (!q) return products.value
+  return products.value.filter(p => String(p.name).toLowerCase().includes(q))
+})
 
-// cart helpers
-function findCartItem(id) { return cart.value.find(i => i.id === id); }
-function cartQty(id) { const it = findCartItem(id); return it ? it.qty : 0; }
+function cartQty(id) {
+  const it = cart.value.find(i => i.id === id)
+  return it ? it.qty : 0
+}
 
 function addToCart(id) {
-  const product = products.value.find(p => p.id === id);
-  if (!product) return;
-  const existing = findCartItem(id);
-  if (existing) {
-    if (existing.qty < product.stock) existing.qty += 1;
-  } else {
-    if (product.stock > 0) cart.value.push({ id, qty: 1 });
-  }
+  const existing = cart.value.find(i => i.id === id)
+  const p = products.value.find(x => x.id === id)
+  if (!p) return
+  if (!existing) cart.value.push({ id: p.id, qty: 1, price: p.price, name: p.name })
+  else existing.qty += 1
 }
 
 function incrementQty(id) {
-  const product = products.value.find(p => p.id === id);
-  const existing = findCartItem(id);
-  if (!product || !existing) return;
-  if (existing.qty < product.stock) existing.qty += 1;
+  const it = cart.value.find(i => i.id === id)
+  if (it) it.qty += 1
 }
+
 function decrementQty(id) {
-  const existing = findCartItem(id);
-  if (!existing) return;
-  existing.qty -= 1;
-  if (existing.qty <= 0) cart.value = cart.value.filter(i => i.id !== id);
+  const it = cart.value.find(i => i.id === id)
+  if (!it) return
+  it.qty -= 1
+  if (it.qty <= 0) {
+    cart.value = cart.value.filter(x => x.id !== id)
+  }
 }
-function removeFromCart(id) {
-  cart.value = cart.value.filter(i => i.id !== id);
+
+function removeItem(id) {
+  cart.value = cart.value.filter(x => x.id !== id)
 }
-function clearCart() { cart.value = []; }
-function checkout() {
-  alert(`Compra finalizada. Total: $${cartTotalPrice.value}`);
-  clearCart();
+function clearCart() {
+  cart.value = []
 }
-//cerrar sesion
+
+const cartDetails = computed(() => {
+  return cart.value.map(i => ({ ...i }))
+})
+
+const totalPrice = computed(() => {
+  return cart.value.reduce((acc, i) => acc + (i.price * i.qty), 0)
+})
+
+/* Navegación a detalle con conservación de scroll */
+const router = useRouter()
+
+function goToDetail(id) {
+  try {
+    sessionStorage.setItem('products_scroll', String(window.scrollY || 0))
+  } catch (e) { }
+  router.push({ name: 'ProductoDetalle', params: { id } })
+}
+
+/* Escuchar evento global desde el detalle para agregar al carrito */
+function onAddFromDetail(e) {
+  const id = e?.detail?.id
+  if (typeof id !== 'undefined') addToCart(id)
+}
+
+onMounted(() => {
+  window.addEventListener('add-to-cart-from-detail', onAddFromDetail)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('add-to-cart-from-detail', onAddFromDetail)
+})
+
+/* Logout */
+import { useAuth } from '../composables/useAuth'
+const auth = useAuth()
 function onLogout() {
   auth.logout()
   router.replace({ path: '/login' })
 }
-
-// cartDetails & totals
-const cartDetails = computed(() => {
-  return cart.value.map(item => {
-    const p = products.value.find(pp => pp.id === item.id) || {};
-    const subtotal = (p.price || 0) * item.qty;
-    return {
-      id: item.id,
-      name: p.name || 'Producto',
-      price: p.price || 0,
-      qty: item.qty,
-      stock: p.stock || 0,
-      subtotal
-    };
-  });
-});
-const cartTotalPrice = computed(() => cartDetails.value.reduce((s, it) => s + it.subtotal, 0));
-const cartTotalItems = computed(() => cart.value.reduce((s, it) => s + it.qty, 0));
 </script>
 
 <style scoped>
-/* estilos mínimos */
 </style>
