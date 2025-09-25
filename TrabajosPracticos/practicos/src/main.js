@@ -3,6 +3,7 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
 import { useAuth } from './composables/useAuth'
+import './styles/global.css'
 
 // Vuetify e imports ya existentes
 import registerPlugins from './plugins/registerPlugins' 

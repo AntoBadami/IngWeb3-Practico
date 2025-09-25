@@ -1,6 +1,6 @@
 
 <template>
-  <v-card :class="{ 'out-of-stock': product.stock === 0 }" elevation="2">
+  <v-card :class="['product-card', { 'out-of-stock': product.stock === 0 }]" elevation="2">
     <v-card-title class="text-h6">{{ product.name }}</v-card-title>
 
     <v-card-text>
@@ -9,12 +9,13 @@
       <div v-else class="font-weight-bold">Sin stock</div>
     </v-card-text>
 
-    <v-card-actions>
+    <v-card-actions class="d-flex justify-space-between">
       <v-btn text small @click="$emit('view-detail', product.id)" :aria-label="`Ver detalle de ${product.name}`">Ver detalle</v-btn>
       <v-spacer />
       <v-btn
         small
-        :disabled="product.stock === 0 || cartQty >= product.stock"
+        :disabled="product.stock === 0 || cartQty >= product.stock" 
+        class="primary"
         @click="$emit('add-to-cart', product.id)"
       >
         Agregar al carrito
