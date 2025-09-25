@@ -1,8 +1,8 @@
 <template>
   <v-container class="fill-height d-flex align-center justify-center">
-    <v-row>
-      <v-col cols="12">
-        <v-card class="pa-6" elevation="6" max-width="420" style="border-radius: 1rem;">
+  <v-row>
+    <v-col cols="12" class="d-flex justify-center">
+      <v-card class="pa-6" elevation="6" max-width="420" style="border-radius: 1rem;">
           <v-card-title class="text-h6">Ingresar</v-card-title>
 
           <v-card-text>
