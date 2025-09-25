@@ -25,7 +25,6 @@
           <v-card-actions>
             <v-btn text @click="goBack">Volver</v-btn>
             <v-spacer />
-            <v-btn color="primary" v-if="product && product.stock > 0" @click="addToCart">Agregar al carrito</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>

@@ -9,13 +9,14 @@
 
     <v-list-item-action>
       <v-btn icon small @click="$emit('decrement', item.id)">
-        <v-icon small>mdi-minus</v-icon>
+        -
       </v-btn>
       <v-btn icon small @click="$emit('increment', item.id)" :disabled="item.qty >= item.stock">
-        <v-icon small>mdi-plus</v-icon>
+        +
       </v-btn>
-      <v-btn icon small @click="$emit('remove', item.id)">
-        <v-icon small>mdi-trash-can-outline</v-icon>
+      
+      <v-btn text small @click="$emit('remove', item.id)">
+        quitar
       </v-btn>
     </v-list-item-action>
   </v-list-item>

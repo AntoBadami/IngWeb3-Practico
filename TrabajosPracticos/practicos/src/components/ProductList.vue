@@ -12,8 +12,8 @@
       </v-col>
 
       <v-col cols="auto" class="d-flex align-center">
-        <v-btn icon @click="drawer = !drawer" :title="drawer ? 'Cerrar carrito' : 'Abrir carrito'">
-          <v-icon>{{ drawer ? 'mdi-cart-off' : 'mdi-cart' }}</v-icon>
+        <v-btn text small class="ml-2" @click="drawer = !drawer" :title="drawer ? 'Cerrar carrito' : 'Abrir carrito'">
+          Carrito
         </v-btn>
 
         <v-btn text small class="ml-2" @click="onLogout">Salir</v-btn>
