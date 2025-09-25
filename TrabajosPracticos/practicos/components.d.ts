@@ -20,5 +20,7 @@ declare module 'vue' {
     RegistroCliente: typeof import('./src/components/RegistroCliente.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    TopBar: typeof import('./src/components/TopBar.vue')['default']
+    TOpBar: typeof import('./src/components/TopBar.vue')['default']
   }
 }

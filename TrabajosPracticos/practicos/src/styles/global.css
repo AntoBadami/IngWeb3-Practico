@@ -1,17 +1,20 @@
 :root{
-  --bg-gradient-start: #fdf9f1;
-  --bg-gradient-end: #fdf9f1
+  --bg-gradient-start: #d7e2f1;
+  --bg-gradient-end: #d7e2f1;
   --card-elev: 10;
   --card-radius: 14px;
-  --primary: #f09000e0;
-  --secondary: #aa6000;
+  --primary: #15163be0;
+  --secondary: #727272;
   --accent: #FB923C;
+
+  --bg-image-url: "/fondo.jpg";
 }
 
 /* Fondo general */
 html, body, #app {
   height: 100%;
   background: linear-gradient(180deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+  
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

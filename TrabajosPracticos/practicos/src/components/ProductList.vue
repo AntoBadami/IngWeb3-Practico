@@ -15,8 +15,6 @@
         <v-btn text small class="ml-2" @click="drawer = !drawer" :title="drawer ? 'Cerrar carrito' : 'Abrir carrito'">
           Carrito
         </v-btn>
-
-        <v-btn text small class="ml-2" @click="onLogout">Salir</v-btn>
       </v-col>
     </v-row>
 
@@ -171,13 +169,6 @@ onBeforeUnmount(() => {
   window.removeEventListener('add-to-cart-from-detail', onAddFromDetail)
 })
 
-/* Logout */
-import { useAuth } from '../composables/useAuth'
-const auth = useAuth()
-function onLogout() {
-  auth.logout()
-  router.replace({ path: '/login' })
-}
 </script>
 
 <style scoped>
