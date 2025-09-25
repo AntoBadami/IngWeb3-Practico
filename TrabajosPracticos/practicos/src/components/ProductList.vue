@@ -82,16 +82,37 @@ function cartQty(id) {
 }
 
 function addToCart(id) {
-  const existing = cart.value.find(i => i.id === id)
   const p = products.value.find(x => x.id === id)
   if (!p) return
-  if (!existing) cart.value.push({ id: p.id, qty: 1, price: p.price, name: p.name })
-  else existing.qty += 1
+
+  const existing = cart.value.find(i => i.id === id)
+  // Si no existe en el carrito, lo agrega con el stock
+  if (!existing) {
+    if ((p.stock ?? 0) <= 0) {
+      alert('Producto sin stock disponible')
+      return
+    }
+    cart.value.push({ id: p.id, qty: 1, price: p.price, name: p.name, stock: p.stock })
+  } else {
+    // Si existe, solo incrementam si no supera el stock
+    if (existing.qty < (p.stock ?? 0)) {
+      existing.qty += 1
+    } else {
+      alert('No hay más stock disponible para ese producto.')
+    }
+  }
 }
 
 function incrementQty(id) {
   const it = cart.value.find(i => i.id === id)
-  if (it) it.qty += 1
+  if (!it) return
+  const p = products.value.find(x => x.id === id)
+  const stock = p?.stock ?? it.stock ?? 0
+  if (it.qty < stock) {
+    it.qty += 1
+  } else {
+    alert('No hay más stock disponible para ese producto.')
+  }
 }
 
 function decrementQty(id) {
@@ -111,11 +132,19 @@ function clearCart() {
 }
 
 const cartDetails = computed(() => {
-  return cart.value.map(i => ({ ...i }))
+  return cart.value.map(i => {
+    // Busca el producto actual para sincronizar stock y calcular subtotal
+    const p = products.value.find(x => x.id === i.id) || {}
+    return {
+      ...i,
+      stock: typeof p.stock !== 'undefined' ? p.stock : 0,
+      subtotal: (i.price || 0) * (i.qty || 0)
+    }
+  })
 })
 
 const totalPrice = computed(() => {
-  return cart.value.reduce((acc, i) => acc + (i.price * i.qty), 0)
+  return cartDetails.value.reduce((acc, i) => acc + (i.subtotal || 0), 0)
 })
 
 /* Navegación a detalle con conservación de scroll */
