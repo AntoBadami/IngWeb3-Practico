@@ -3,9 +3,8 @@
     <v-container>
       <v-row no-gutters class="fill-height align-center">
         <v-col cols="auto" class="d-flex align-center">
-          <!-- si querés logo: public/logo.png -->
-          <!-- <img src="/logo.png" alt="logo" style="height:32px; margin-right:8px;" /> -->
-          <span class="text-h6">Mi tienda</span>
+          <img src="../assets/logo.png" alt="logo" style="height:48px; margin-right:8px;" />
+          <span class="text-h6">Shop</span>
         </v-col>
 
         <v-spacer />
@@ -22,9 +21,9 @@
 <script setup>
 import { inject, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useAuth } from '@/composables/useAuth' // asume que ya existe en tu proyecto
+import { useAuth } from '@/composables/useAuth' 
 
-const cart = inject('cart') // viene desde App.vue
+const cart = inject('cart') 
 const route = useRoute()
 const router = useRouter()
 const auth = useAuth()
@@ -36,7 +35,6 @@ const showActions = computed(() => {
 
 
 function onLogout() {
-  // usa tu composable de auth (si no existe, reemplazalo por la lógica que tengas)
   auth.logout && auth.logout()
   router.replace({ path: '/login' })
 }
