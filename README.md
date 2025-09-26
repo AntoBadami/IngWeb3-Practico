@@ -1,7 +1,5 @@
 # Practico IngWeb3 - Tienda (Vue + Vuetify)
 
-![Uploading logo.png…]()
-
 
 Repositorio de trabajo práctico de Ingeniería Web 3.
 
